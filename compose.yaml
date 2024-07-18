@@ -1,14 +1,16 @@
 services:
+
   db:
     image: mariadb:11
     restart: always
     volumes:
-      - db_data:/var/lib/mysql
+      - ./wp_db:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: /run/secrets/db_root_password
       MYSQL_DATABASE: /run/secrets/db_name
       MYSQL_USER: /run/secrets/wp_user
       MYSQL_PASSWORD: /run/secrets/db_password
+
   phpmyadmin:
     depends_on:
       - db
@@ -20,6 +22,7 @@ services:
       PMA_PASSWORD: /run/secrets/db_password
     ports:
       - "8080:80"
+
   wordpress:
     depends_on:
       - db
@@ -33,16 +36,14 @@ services:
       WORDPRESS_DB_PASSWORD: /run/secrets/db_password
       WORDPRESS_DB_NAME: /run/secrets/db_name
     volumes:
-      - wp_data:/var/www/html
+      - ./wp_content:/var/www/html
+
 secrets:
   db_password:
-    file: ./data/db_password.txt
+    file: ./secrets/db_password.txt
   db_root_password:
-    file: ./data/db_root_password.txt
+    file: ./secrets/db_root_password.txt
   db_name:
-    file: ./data/db_name.txt
+    file: ./secrets/db_name.txt
   wp_user:
-    file: ./data/wp_user.txt
-volumes:
-  db_data:
-  wp_data:
+    file: ./secrets/wp_user.txt
